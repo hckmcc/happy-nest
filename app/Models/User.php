@@ -49,7 +49,6 @@ class User extends Authenticatable
 
     public function getRatingAttribute()
     {
-        // Безопасно получаем значение рейтинга
         return round($this->reviews_avg_rate ?? 0, 1);
     }
     public function reviews()
@@ -64,5 +63,18 @@ class User extends Authenticatable
     public function favourites()
     {
         return $this->hasMany(Favourite::class, 'user_id');
+    }
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id')->withTimestamps();
+    }
+
+    public function hasRole($role)
+    {
+        return $this->roles->contains('slug', $role);
+    }
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id');
     }
 }

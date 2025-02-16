@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Category extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'parent_category_id',
+        'name',
+        'icon'
+    ];
     public function ads()
     {
         return $this->hasMany(Ad::class);
@@ -29,9 +36,16 @@ class Category extends Model
             ->whereNull('parent_category_id')
             ->get();
     }
-    protected $fillable = [
-        'parent_category_id',
-        'name',
-        'icon'
-    ];
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function () {
+            Cache::forget('categories');
+        });
+
+        static::deleted(function () {
+            Cache::forget('categories');
+        });
+    }
 }

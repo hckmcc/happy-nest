@@ -164,7 +164,7 @@
 
             <!-- Кнопка удаления объявления -->
             <div class="mt-6">
-                <form action="{{ route('ad.delete', $ad) }}"
+                <form action="{{ route('ad.delete', ['ad' => $ad, 'from' => 'site']) }}"
                       method="POST"
                       onsubmit="return confirm('Вы уверены, что хотите удалить это объявление?')">
                     @csrf

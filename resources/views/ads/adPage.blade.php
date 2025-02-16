@@ -14,6 +14,11 @@
                                 <div class="inline-block bg-[var(--accent-color)] text-white text-sm px-3 py-1 rounded-full">
                                     {{ $ad->category->name }}
                                 </div>
+                                @if($ad->hasPromotion())
+                                    <div class="inline-block bg-green-600 text-white text-sm px-3 py-1 rounded-full">
+                                        <p>Продвинуто</p>
+                                    </div>
+                                @endif
                             </div>
                             <!-- Фото товара -->
                             <div class="flex items-center" style="margin-inline: 15%">
@@ -66,7 +71,7 @@
                             <div class="space-y-3">
                                 @if(auth()->id() !== $ad->user_id)
                                     <!-- Кнопка написать сообщение -->
-                                    <a href="{{ route('chat.show', ['ad' => $ad->id, 'user' => $ad->user_id]) }}"
+                                    <a href="{{ route('chat.show', ['ad' => $ad->id, 'user' => $ad->user_id]) }}" data-auth-required
                                        class="block w-full text-center mb-2 px-6 py-3 bg-[var(--primary-color)] text-white rounded-lg shadow-md hover:shadow-lg transition-colors">
                                         <i class="far fa-comment-alt mr-2"></i>
                                         Написать продавцу
@@ -88,6 +93,10 @@
                                             <a href="{{ route('ad.edit', $ad) }}"
                                                class="flex-1 text-center mr-2 px-6 py-3 bg-[var(--primary-color)] text-white rounded-lg shadow-md hover:shadow-lg transition-colors">
                                                 Редактировать
+                                            </a>
+                                            <a href="{{ route('ad.promote.show', $ad) }}"
+                                               class="flex-1 text-center mr-2 px-6 py-3 bg-[var(--primary-color)] text-white rounded-lg shadow-md hover:shadow-lg transition-colors">
+                                                Продвинуть
                                             </a>
                                             <form action="{{ route('ad.complete', $ad) }}"
                                                   method="POST"
@@ -179,10 +188,72 @@
 
                                 <!-- Футер карточки -->
                                 <div class="px-4 py-3 bg-gray-50 border-t">
-                                    <!-- Кнопка подробнее на всю ширину -->
-                                    <a href="{{ route('ad.show', $similarAd) }}" class="block w-full text-center text-sm text-[var(--accent-color)] hover:bg-gray-100 rounded py-1">
-                                        Подробнее
-                                    </a>
+                                    <div class="flex justify-between items-center">
+                                        <!-- Кнопки действий для активных объявлений -->
+                                        <div class="flex space-x-4">
+                                            @auth
+                                                <button class="favourite-btn" data-auth-required data-ad-id="{{ $similarAd->id }}">
+                                                    <i class="fa-heart {{ $similarAd->isFavouritedBy(auth()->user()) ? 'fas' : 'far' }}"></i>
+                                                </button>
+                                                <div x-data="{ reportModal: false }">
+                                                    <!-- Кнопки -->
+                                                    <button type="button" @click="$store.modal.openReport()">
+                                                        <i class="fa fa-file"></i>
+                                                    </button>
+                                                    <!-- Модальное окно report -->
+                                                    <template x-teleport="body">
+                                                        <div x-show="$store.modal.isReportOpen"
+                                                             x-cloak
+                                                             @click="$store.modal.closeReport()"
+                                                             class="modal-backdrop">
+                                                            <div @click.stop
+                                                                 class="modal-content">
+                                                                <div class="flex justify-between items-center mb-6">
+                                                                    <h2 class="text-xl font-bold">Report</h2>
+                                                                    <button @click="$store.modal.closeReport()"
+                                                                            class="text-gray-400 hover:text-gray-600">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+
+                                                                <form action="{{ route('reports.add') }}" method="POST" class="space-y-4">
+                                                                    @csrf
+                                                                    <div>
+                                                                        <input type="hidden"
+                                                                               name="ad_id"
+                                                                               value="{{ $similarAd->id }}"
+                                                                               class="form-input"
+                                                                               required>
+                                                                        <input type="hidden"
+                                                                               name="user_id"
+                                                                               value="{{ auth()->user()->id }}"
+                                                                               class="form-input"
+                                                                               required>
+                                                                        <p class="error-message hidden" id="report-error" style="text-decoration-color: red"></p>
+                                                                        <textarea id="reason"
+                                                                                  name="reason"
+                                                                                  rows="4"
+                                                                                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring focus:ring-[var(--primary-color)] focus:ring-opacity-50"
+                                                                                  placeholder="Подробно опишите вашу жалобу">{{ old('reason') }}</textarea>
+                                                                    </div>
+
+                                                                    <button type="submit"
+                                                                            class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-[var(--primary-dark)]">
+                                                                        Отправить
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            @endauth
+                                        </div>
+                                        <!-- Кнопка подробнее -->
+                                        <a href="{{ route('ad.show', $similarAd) }}"
+                                           class="inline-block px-4 py-1 text-sm text-[var(--accent-color)] hover:bg-gray-100 rounded">
+                                            Подробнее
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
@@ -198,5 +269,53 @@
             button.innerHTML = `<i class="fas fa-phone-alt mr-2"></i>${phone}`;
             button.onclick = null;
         }
+    </script>
+    <style>
+        .favourite-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .favourite-btn .far {
+            color: #666;
+        }
+
+        .favourite-btn .fas {
+            color: #ff4444;
+        }
+
+        .favourite-btn:hover .far {
+            color: #ff4444;
+        }
+    </style>
+    <script>
+        $(document).ready(function() {
+            console.log('jQuery loaded');
+            $('.favourite-btn').click(function(e) {
+                e.preventDefault();
+                let button = $(this);
+                let adId = button.data('ad-id');
+                let icon = $(this).find('.fa-heart');
+                $.ajax({
+                    url: `/favourites/${adId}`,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.status === 'added') {
+                            icon.removeClass('far').addClass('fas');
+                        } else {
+                            icon.removeClass('fas').addClass('far');
+                        }
+                    },
+                    error: function() {
+                        alert('Произошла ошибка');
+                    }
+                });
+            });
+        });
     </script>
 @endsection

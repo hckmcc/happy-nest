@@ -9,7 +9,7 @@
 
     <!-- Форма -->
     <div class="bg-white rounded-lg shadow">
-        <form action="{{ route('create_ad') }}" method="POST" enctype="multipart/form-data" class="p-6">
+        <form action="{{ route('create_ad',  ['from' => 'site']) }}" method="POST" enctype="multipart/form-data" class="p-6">
             @csrf
             <!-- Фото товара -->
             <div class="mb-6">

@@ -49,4 +49,16 @@ class Ad extends Model
     {
         return $this->hasMany(Favourite::class, 'ad_id');
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'ad_id');
+    }
+    public function promotions()
+    {
+        return $this->belongsToMany(PromotionType::class, 'ad_promotions', 'ad_id', 'promotion_id')->withTimestamps();
+    }
+    public function hasPromotion()
+    {
+        return $this->promotions()->count() !== 0;
+    }
 }

@@ -10,13 +10,6 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    private RabbitMQService $rabbitMQService;
-
-    public function __construct(RabbitMQService $rabbitMQService)
-    {
-        $this->rabbitMQService = $rabbitMQService;
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -32,8 +25,6 @@ class ReportController extends Controller
 
         SendReportToYouGile::dispatch($report->id)
             ->onQueue('reports');
-
-        //return response()->json(['message' => 'Report queued for processing']);
 
         return back()->with('success');
     }

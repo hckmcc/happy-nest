@@ -8,8 +8,11 @@
         "php": "^8.2",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
+        "laravel/ui": "*",
         "php-amqplib/php-amqplib": "^3.7",
-        "vladimir-yuldashev/laravel-queue-rabbitmq": "^14.1"
+        "predis/predis": "*",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^14.1",
+        "yoomoney/yookassa-sdk-php": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

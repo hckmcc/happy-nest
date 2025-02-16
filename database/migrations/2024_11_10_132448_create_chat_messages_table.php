@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('chat_messages', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedBigInteger('seller_id');
-            $table->unsignedBigInteger('buyer_id');
-            $table->unsignedBigInteger('ad_id');
-            $table->unsignedBigInteger('message_author_id');
+            $table->unsignedBigInteger('seller_id')->nullable();
+            $table->unsignedBigInteger('buyer_id')->nullable();
+            $table->unsignedBigInteger('ad_id')->nullable();
+            $table->unsignedBigInteger('message_author_id')->nullable();
             $table->text('message');
             $table->timestamps();
 
-            $table->foreign('seller_id')->references('id')->on('users');
-            $table->foreign('buyer_id')->references('id')->on('users');
-            $table->foreign('message_author_id')->references('id')->on('users');
-            $table->foreign('ad_id')->references('id')->on('ads');
+            $table->foreign('seller_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('buyer_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('message_author_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('ad_id')->references('id')->on('ads')->onDelete('set null');
         });
     }
 

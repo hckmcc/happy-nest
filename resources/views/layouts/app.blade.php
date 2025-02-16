@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Happy Nest - Уютный маркет детских товаров</title>
-    @vite('resources/css/app.css')
+    <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -209,98 +209,22 @@
 </head>
 <body class="{{ auth()->check() ? 'user-authenticated' : '' }} bg-[var(--bg-color)]">
 <!-- Главное меню -->
-<header class="bg-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<header class="bg-white shadow-md z-10 relative">
+    <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Левая часть с логотипом и кнопкой категорий -->
             <div class="flex items-center space-x-4">
                 <!-- Логотип -->
                 <a href="{{ route('home') }}" class="flex items-center space-x-2">
 
-                    <span class="text-xl font-bold text-[var(--primary-color)]">🪺 Happy Nest</span>
+                    <span class="text-3xl font-bold text-[var(--primary-color)]">🪺 Happy Nest</span>
                 </a>
-
+            </div>
+            <div class="flex items-center space-x-4">
                 <!-- Кнопка категорий -->
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open"
-                            @click.away="open = false"
-                            class="flex items-center px-4 py-2 text-sm font-medium text-[var(--primary-color)] hover:bg-[var(--bg-color)] rounded-lg transition duration-150 ease-in-out">
-                        <i class="fas fa-th-large mr-2"></i>
-                        Категории
-                        <i class="fas fa-chevron-down ml-2 transform transition-transform duration-150"
-                           :class="{'rotate-180': open}"></i>
-                    </button>
-
-                    <!-- Выпадающее меню категорий -->
-                    <div x-show="open"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 transform scale-y-0"
-                         x-transition:enter-end="opacity-100 transform scale-y-100"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 transform scale-y-100"
-                         x-transition:leave-end="opacity-0 transform scale-y-0"
-                         class="absolute left-0 mt-2 w-72 bg-white rounded-lg shadow-lg py-2 z-50"
-                         x-data="{ activeCategory: null }">
-
-                        @foreach($categories as $category)
-                            <div class="relative">
-                                <!-- Родительская категория -->
-                                <div class="category-item px-4 py-2 hover:bg-[var(--bg-color)] cursor-pointer"
-                                     @click="activeCategory = activeCategory === {{ $category->id }} ? null : {{ $category->id }}">
-                                    <div class="flex items-center justify-between text-gray-700">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-{{ $category->icon ?? 'folder' }} w-5"></i>
-                                            <span class="ml-2">{{ $category->name }}</span>
-                                        </div>
-                                        @if($category->children && $category->children->count() > 0)
-                                            <i class="fas fa-chevron-right transform transition-transform duration-150"
-                                               :class="{'rotate-90': activeCategory === {{ $category->id }}}"></i>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Подкатегории -->
-                                @if($category->children && $category->children->count() > 0)
-                                    <div x-show="activeCategory === {{ $category->id }}"
-                                         x-transition:enter="transition ease-out duration-200"
-                                         x-transition:enter-start="opacity-0"
-                                         x-transition:enter-end="opacity-100"
-                                         class="ml-4 border-l-2 border-[var(--secondary-color)]">
-                                        @foreach($category->children as $child)
-                                            <div class="relative">
-                                                <div class="category-item px-4 py-2 hover:bg-[var(--bg-color)] cursor-pointer">
-                                                    <div class="flex items-center justify-between text-gray-600">
-                                                        <div class="flex items-center">
-                                                            <i class="fas fa-{{ $child->icon ?? 'folder' }} w-5"></i>
-                                                            <span class="ml-2">{{ $child->name }}</span>
-                                                        </div>
-                                                        @if($child->children && $child->children->count() > 0)
-                                                            <i class="fas fa-chevron-right"></i>
-                                                        @endif
-                                                    </div>
-                                                </div>
-
-                                                <!-- Подкатегории третьего уровня -->
-                                                @if($child->children && $child->children->count() > 0)
-                                                    <div class="ml-4 border-l-2 border-[var(--secondary-color)]">
-                                                        @foreach($child->children as $grandchild)
-                                                            <div class="category-item px-4 py-2 hover:bg-[var(--bg-color)]">
-                                                                <div class="flex items-center text-gray-500">
-                                                                    <i class="fas fa-{{ $grandchild->icon ?? 'folder' }} w-5"></i>
-                                                                    <span class="ml-2">{{ $grandchild->name }}</span>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+                <a href="{{ route('categories') }}" class="flex items-center space-x-2">
+                    <span class="text-lg font-normal text-[var(--primary-color)]">Категории</span>
+                </a>
             </div>
 
             <!-- Центральная часть с поиском -->
@@ -367,7 +291,7 @@
                                 Мои объявления
                             </a>
                             <a href="{{ route('favourites') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-[var(--bg-color)]" data-auth-required>
-                                <i class="fas fa-list mr-2"></i>
+                                <i class="fas fa-heart mr-2"></i>
                                 Избранное
                             </a>
                             <a href="{{ route('my_chats') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-[var(--bg-color)]" data-auth-required>
@@ -527,6 +451,13 @@
                                                    required>
                                             <p class="error-message hidden" id="register-password-confirmation-error"></p>
                                         </div>
+                                        <div>
+                                            <input class="form-input"
+                                                   type="hidden"
+                                                   name="roles[]"
+                                                   value=""
+                                                   >
+                                        </div>
 
                                         <!-- Общая ошибка -->
                                         <div class="error-message hidden" id="register-error"></div>
@@ -652,12 +583,6 @@
                 this.isRegisterOpen = false;
                 this.isLoginOpen = true;
             },
-
-            handleSuccessfulAuth() {
-                this.closeLogin();
-                this.closeRegister();
-                window.location.reload();
-            }
         });
     });
 
@@ -678,6 +603,7 @@
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
                         },
+                        credentials: 'include',
                         body: formData
                     });
 
@@ -697,7 +623,7 @@
                     }
 
                     if (data.success) {
-                        Alpine.store('modal').handleSuccessfulAuth();
+                        window.location.href = data.redirect;
                     }
 
                 } catch (error) {
@@ -721,6 +647,7 @@
                             'Accept': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
                         },
+                        credentials: 'include',
                         body: formData
                     });
 
@@ -740,7 +667,7 @@
                     }
 
                     if (data.success) {
-                        Alpine.store('modal').handleSuccessfulAuth();
+                        window.location.href = data.redirect;
                     }
 
                 } catch (error) {

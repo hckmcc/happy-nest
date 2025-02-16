@@ -23,4 +23,15 @@ class ReviewController extends Controller
 
         return back()->with('success', 'Отзыв успешно добавлен');
     }
+
+    public function delete(Review $review)
+    {
+        if (!($review->user_id === auth()->id() or auth()->user()->hasRole('admin'))) {
+            abort(403);
+        }
+
+        $review->delete();
+
+        return back()->with('success', 'Отзыв успешно удален');
+    }
 }

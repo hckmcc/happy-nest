@@ -23,7 +23,7 @@
             <a href="" class="category-card block p-6 bg-white rounded-lg shadow-md hover:shadow-lg">
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-[var(--accent-color)] bg-opacity-20 rounded-full">
-                        <img src="{{ $category->icon }}" alt="" class="category-img">
+                        <img src="{{ asset('storage/' . $category->icon) }}" alt="" class="category-img">
                     </div>
                     <h3 class="text-lg font-semibold text-gray-800">{{ $category->name }}</h3>
                 </div>
@@ -73,67 +73,73 @@
                     </div>
 
                     <!-- Футер карточки -->
-                    <div class="px-4 py-3 bg-gray-50 border-t flex-row">
-                        <!-- Кнопка подробнее на всю ширину -->
-                        <a href="{{ route('ad.show', $ad) }}" class="block text-center text-sm text-[var(--accent-color)] hover:bg-gray-100 rounded py-1">
-                            Подробнее
-                        </a>
-                        @auth
-                            <button class="favourite-btn" data-auth-required data-ad-id="{{ $ad->id }}">
-                                <i class="fa-heart {{ $ad->isFavouritedBy(auth()->user()) ? 'fas' : 'far' }}"></i>
-                            </button>
-                            <div x-data="{ reportModal: false }">
-                                <!-- Кнопки -->
-                                <button type="button" @click="$store.modal.openReport()">
-                                    <i class="fa fa-file"></i>
-                                </button>
-                                <!-- Модальное окно report -->
-                                <template x-teleport="body">
-                                    <div x-show="$store.modal.isReportOpen"
-                                         x-cloak
-                                         @click="$store.modal.closeReport()"
-                                         class="modal-backdrop">
-                                        <div @click.stop
-                                             class="modal-content">
-                                            <div class="flex justify-between items-center mb-6">
-                                                <h2 class="text-xl font-bold">Report</h2>
-                                                <button @click="$store.modal.closeReport()"
-                                                        class="text-gray-400 hover:text-gray-600">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
+                    <div class="px-4 py-3 bg-gray-50 border-t">
+                        <div class="flex justify-between items-center">
+                            <!-- Кнопки действий для активных объявлений -->
+                            <div class="flex space-x-4">
+                                @auth
+                                    <button class="favourite-btn" data-auth-required data-ad-id="{{ $ad->id }}">
+                                        <i class="fa-heart {{ $ad->isFavouritedBy(auth()->user()) ? 'fas' : 'far' }}"></i>
+                                    </button>
+                                    <div x-data="{ reportModal: false }">
+                                        <!-- Кнопки -->
+                                        <button type="button" @click="$store.modal.openReport()">
+                                            <i class="fa fa-file"></i>
+                                        </button>
+                                        <!-- Модальное окно report -->
+                                        <template x-teleport="body">
+                                            <div x-show="$store.modal.isReportOpen"
+                                                 x-cloak
+                                                 @click="$store.modal.closeReport()"
+                                                 class="modal-backdrop">
+                                                <div @click.stop
+                                                     class="modal-content">
+                                                    <div class="flex justify-between items-center mb-6">
+                                                        <h2 class="text-xl font-bold">Report</h2>
+                                                        <button @click="$store.modal.closeReport()"
+                                                                class="text-gray-400 hover:text-gray-600">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
 
-                                            <form action="{{ route('reports.add') }}" method="POST" class="space-y-4">
-                                                @csrf
-                                                <div>
-                                                    <input type="hidden"
-                                                           name="ad_id"
-                                                           value="{{ $ad->id }}"
-                                                           class="form-input"
-                                                           required>
-                                                    <input type="hidden"
-                                                           name="user_id"
-                                                           value="{{ auth()->user()->id }}"
-                                                           class="form-input"
-                                                           required>
-                                                    <p class="error-message hidden" id="report-error" style="text-decoration-color: red"></p>
-                                                    <textarea id="reason"
-                                                              name="reason"
-                                                              rows="4"
-                                                              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring focus:ring-[var(--primary-color)] focus:ring-opacity-50"
-                                                              placeholder="Подробно опишите вашу жалобу">{{ old('reason') }}</textarea>
+                                                    <form action="{{ route('reports.add') }}" method="POST" class="space-y-4">
+                                                        @csrf
+                                                        <div>
+                                                            <input type="hidden"
+                                                                   name="ad_id"
+                                                                   value="{{ $ad->id }}"
+                                                                   class="form-input"
+                                                                   required>
+                                                            <input type="hidden"
+                                                                   name="user_id"
+                                                                   value="{{ auth()->user()->id }}"
+                                                                   class="form-input"
+                                                                   required>
+                                                            <p class="error-message hidden" id="report-error" style="text-decoration-color: red"></p>
+                                                            <textarea id="reason"
+                                                                      name="reason"
+                                                                      rows="4"
+                                                                      class="block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--primary-color)] focus:ring focus:ring-[var(--primary-color)] focus:ring-opacity-50"
+                                                                      placeholder="Подробно опишите вашу жалобу">{{ old('reason') }}</textarea>
+                                                        </div>
+
+                                                        <button type="submit"
+                                                                class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-[var(--primary-dark)]">
+                                                            Отправить
+                                                        </button>
+                                                    </form>
                                                 </div>
-
-                                                <button type="submit"
-                                                        class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary-color)] hover:bg-[var(--primary-dark)]">
-                                                    Отправить
-                                                </button>
-                                            </form>
-                                        </div>
+                                            </div>
+                                        </template>
                                     </div>
-                                </template>
+                                @endauth
                             </div>
-                        @endauth
+                            <!-- Кнопка подробнее -->
+                            <a href="{{ route('ad.show', $ad) }}"
+                               class="inline-block px-4 py-1 text-sm text-[var(--accent-color)] hover:bg-gray-100 rounded">
+                                Подробнее
+                            </a>
+                        </div>
                     </div>
                 </div>
             @endforeach
@@ -173,7 +179,6 @@
         border: none;
         background: none;
         cursor: pointer;
-        padding: 5px;
         transition: all 0.3s ease;
     }
 

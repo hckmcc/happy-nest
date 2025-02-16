@@ -13,7 +13,7 @@ class CheckAuthWithModal
             session()->flash('showAuthModal', true);
             return response()->json([
                 'needAuth' => true,
-                'currentUrl' => $request->fullUrl() // опционально отправляем текущий URL
+                'currentUrl' => $request->fullUrl()
             ], 401);
         }
 

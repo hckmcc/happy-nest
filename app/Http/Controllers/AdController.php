@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ad;
 use App\Models\Category;
+use App\Models\PromotionType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,10 +12,6 @@ class AdController extends Controller
 {
     public function showMyAds()
     {
-        $categories = Category::with('children.children') // загружаем два уровня вложенности
-        ->whereNull('parent_category_id')
-            ->get();
-
         $activeAds = Ad::query()  // добавляем query()
             ->where('user_id', auth()->id())
             ->where('is_completed', false)
@@ -29,16 +26,16 @@ class AdController extends Controller
             ->latest()
             ->get();
 
-        return view('ads.myAds', compact('categories','activeAds', 'completedAds'));
+        return view('ads.myAds', compact('activeAds', 'completedAds'));
     }
 
     public function showAd(Ad $ad)
     {
-        $categories = Category::with('children.children') // загружаем два уровня вложенности
-        ->whereNull('parent_category_id')
-            ->get();
         // Увеличиваем счетчик просмотров
-        $ad->increment('views');
+        if (auth()->id() !== $ad->user_id)
+        {
+            $ad->increment('views');
+        }
 
         // Получаем похожие объявления
         $similarAds = Ad::where('category_id', $ad->category_id)
@@ -48,7 +45,7 @@ class AdController extends Controller
             ->take(4)
             ->get();
 
-        return view('ads.adPage', compact('categories', 'ad', 'similarAds'));
+        return view('ads.adPage', compact( 'ad', 'similarAds'));
     }
     public function showCreateAdForm()
     {
@@ -82,8 +79,13 @@ class AdController extends Controller
 
         $ad->save();
 
-        return redirect()->route('my_ads', $ad)
-            ->with('success', 'Объявление успешно создано!');
+        if ($request->from === 'admin') {
+            return redirect()->route('admin.ads')
+                ->with('success', 'Объявление успешно удалено');
+        }
+
+        return redirect()->route('my_ads')
+            ->with('success', 'Объявление успешно удалено');
     }
     public function complete(Ad $ad)
     {
@@ -135,7 +137,7 @@ class AdController extends Controller
             'price' => 'required|numeric|min:0',
             'address' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
-            'photo' => 'required|image|max:2048', // максимум 2MB
+            'photo' => 'nullable|image|max:2048', // максимум 2MB
         ]);
 
         // Если загружено новое фото
@@ -154,10 +156,10 @@ class AdController extends Controller
             ->with('success', 'Объявление успешно обновлено');
     }
 
-    public function delete(Ad $ad)
+    public function delete(Ad $ad, Request $request)
     {
         // Проверка прав доступа
-        if ($ad->user_id !== auth()->id()) {
+        if (!($ad->user_id === auth()->id() or auth()->user()->hasRole('admin'))) {
             abort(403);
         }
 
@@ -168,7 +170,20 @@ class AdController extends Controller
 
         $ad->delete();
 
+        if ($request->from === 'admin') {
+            return redirect()->route('admin.ads')
+                ->with('success', 'Объявление успешно удалено');
+        }
+
         return redirect()->route('my_ads')
             ->with('success', 'Объявление успешно удалено');
+    }
+    public function showAdPromotePage(Ad $ad)
+    {
+        if ($ad->user_id !== auth()->id()) {
+            abort(403);
+        }
+        $promotionTypes = PromotionType::all();
+        return view('ads.adPromotePage', compact('ad', 'promotionTypes'));
     }
 }

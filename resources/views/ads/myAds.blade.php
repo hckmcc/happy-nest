@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <div class="min-h-screen py-8">
+    <div class="bg-white min-h-screen py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Заголовок -->
             <div class="mb-8">
@@ -63,11 +63,15 @@
                                             <img src="{{ asset('storage/' . $ad->photo) }}"
                                                  alt="{{ $ad->name }}"
                                                  class="w-full h-full object-cover {{ $ad->is_completed ? 'grayscale' : '' }}">
-                                            <span class=" bg-[var(--accent-color)] text-white text-sm rounded-full" style="padding: 2px 4px; margin: 8px;">
-                                                {{ $ad->category ? $ad->category->name : 'Без категории' }}
-                                            </span>
                                         </div>
-
+                                        <span class=" bg-[var(--accent-color)] text-white text-sm rounded-full" style="padding: 2px 4px; margin: 8px;">
+                                            {{ $ad->category ? $ad->category->name : 'Без категории' }}
+                                        </span>
+                                        @if($ad->hasPromotion())
+                                            <span class=" bg-green-600 text-white text-sm rounded-full" style="padding: 2px 4px; margin: 8px;">
+                                                Продвинуто
+                                            </span>
+                                        @endif
                                         <!-- Информация о товаре -->
                                         <div class="px-4 py-3">
                                             <h3 class="text-base font-semibold {{ $ad->is_completed ? 'text-gray-600' : 'text-gray-800' }} mb-3 line-clamp-2 min-h-[2.5rem]">

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\YouGileService;
+use App\Services\YukassaService;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -26,5 +27,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->app['router']->aliasMiddleware('auth.modal', \App\Http\Middleware\CheckAuthWithModal::class);
+        $this->app['router']->aliasMiddleware('role', \App\Http\Middleware\CheckRole::class);
     }
 }

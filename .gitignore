@@ -6,6 +6,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/docker/postgres/data
 .env
 .env.backup
 .env.production
@@ -20,3 +21,4 @@ yarn-error.log
 /.idea
 /.vscode
 /.zed
+/rabbitmq/.erlang.cookie

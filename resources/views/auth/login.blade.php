@@ -1,134 +1,73 @@
-<!DOCTYPE html>
-<!-- Coding By CodingNepal - codingnepalweb.com -->
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Login </title>
-</head>
-<body>
-<div class="wrapper">
-    <h2>Login</h2>
-    @if ($errors->any())
-        <div>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">{{ __('Login') }}</div>
+
+                <div class="card-body">
+                    <form method="POST" action="{{ route('login') }}">
+                        @csrf
+
+                        <div class="row mb-3">
+                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
+
+                                @error('email')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+
+                                @error('password')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 offset-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+
+                                    <label class="form-check-label" for="remember">
+                                        {{ __('Remember Me') }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-0">
+                            <div class="col-md-8 offset-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    {{ __('Login') }}
+                                </button>
+
+                                @if (Route::has('password.request'))
+                                    <a class="btn btn-link" href="{{ route('password.request') }}">
+                                        {{ __('Forgot Your Password?') }}
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    @endif
-    <form action="{{ route('login') }}" method="POST">
-        @csrf
-        <div class="input-box">
-            <label style="color: red"></label>
-            <input type="text" placeholder="Enter" name="email" value="{{ old('email') }}" required>
-        </div>
-        <div class="input-box">
-            <label style="color: red"></label>
-            <input type="password" placeholder="Password" name="password" required>
-        </div>
-        <div class="input-box button">
-            <input type="Submit" value="Login">
-        </div>
-        <div class="text">
-            <h3>Don't have an account? <a href="{{ route('register') }}">Register now</a></h3>
-        </div>
-    </form>
-    <style>@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-        body{
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #4070f4;
-        }
-        .wrapper{
-            position: relative;
-            max-width: 430px;
-            width: 100%;
-            background: #fff;
-            padding: 34px;
-            border-radius: 6px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-        }
-        .wrapper h2{
-            position: relative;
-            font-size: 22px;
-            font-weight: 600;
-            color: #333;
-        }
-        .wrapper h2::before{
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            height: 3px;
-            width: 28px;
-            border-radius: 12px;
-            background: #4070f4;
-        }
-        .wrapper form{
-            margin-top: 30px;
-        }
-        .wrapper form .input-box{
-            margin: 18px 0;
-        }
-        form .input-box input{
-            height: 52px;
-            width: 100%;
-            outline: none;
-            padding: 0 15px;
-            font-size: 17px;
-            font-weight: 400;
-            color: #333;
-            border: 1.5px solid #C7BEBE;
-            border-bottom-width: 2.5px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-        .input-box input:focus,
-        .input-box input:valid{
-            border-color: #4070f4;
-        }
-        form .policy{
-            display: flex;
-            align-items: center;
-        }
-        form h3{
-            color: #707070;
-            font-size: 14px;
-            font-weight: 500;
-            margin-left: 10px;
-        }
-        .input-box.button input{
-            color: #fff;
-            letter-spacing: 1px;
-            border: none;
-            background: #4070f4;
-            cursor: pointer;
-        }
-        .input-box.button input:hover{
-            background: #0e4bf1;
-        }
-        form .text h3{
-            color: #333;
-            width: 100%;
-            text-align: center;
-        }
-        form .text h3 a{
-            color: #4070f4;
-            text-decoration: none;
-        }
-        form .text h3 a:hover{
-            text-decoration: underline;
-        }</style>
+    </div>
 </div>
-</body>
-</html>
+@endsection
